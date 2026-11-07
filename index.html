@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Дело № 1-УПК</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="УПК">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1310">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+[hidden]{display:none!important}
+*{-webkit-user-select:none;user-select:none}
+input,textarea{-webkit-user-select:text;user-select:text}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=PT+Serif:wght@400;700&family=PT+Mono&display=swap">
+<style>
+/* Layout: one-screen courtroom. Dark oak bench, a paper "case sheet" in the middle, brass HUD on top, rubber stamps as feedback. Single committed dark look. */
+:root{
+  color-scheme:dark;
+  --oak:#1a1310; --oak2:#2a1d17; --brass:#d9a441; --brass-dim:#8a6a2e;
+  --sheet:#eceae4; --sheet-ink:#1c1b19; --sheet-muted:#6b665c; --rule:#cfcac0;
+  --stamp:#c3262b; --ok:#1d7a4f; --text:#efe6d6; --muted:#a8998a;
+  --f-head:"Oswald","Arial Narrow",sans-serif; --f-body:"PT Serif",Georgia,serif; --f-mono:"PT Mono",ui-monospace,monospace;
+}
+html,body{height:100%}
+body{
+  background:var(--oak);
+  background-image:repeating-linear-gradient(92deg,rgba(255,255,255,.018) 0 2px,transparent 2px 9px),radial-gradient(120% 70% at 50% 0%,#3a271c 0%,var(--oak) 60%);
+  color:var(--text); font:16px/1.45 var(--f-body);
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.app{max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;gap:14px;padding-block:14px 20px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;border-bottom:1px solid var(--brass-dim);padding-bottom:10px}
+.case{font:500 11px var(--f-mono);color:var(--brass);letter-spacing:.06em}
+h1{font:700 24px/1 var(--f-head);text-transform:uppercase;letter-spacing:.04em;margin:4px 0 0;color:var(--text)}
+.tabs{display:flex;gap:4px}
+.tabs button{border:1px solid var(--brass-dim);background:none;color:var(--muted);font:500 13px var(--f-head);text-transform:uppercase;letter-spacing:.06em;padding:7px 10px;border-radius:4px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--brass);border-color:var(--brass);color:var(--oak)}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mode{border:1px solid var(--oak2);background:var(--oak2);border-radius:6px;padding:10px 6px;color:var(--text);cursor:pointer;text-align:center;font:600 14px var(--f-head);text-transform:uppercase;letter-spacing:.05em}
+.mode span{display:block;font:400 11px var(--f-body);text-transform:none;letter-spacing:0;color:var(--muted);margin-top:3px}
+.mode[aria-pressed="true"]{border-color:var(--brass);box-shadow:inset 0 -3px 0 var(--brass)}
+.hud{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;font:13px var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.trust{display:flex;gap:4px}
+.trust svg{width:20px;height:20px}
+.trust .lost{opacity:.18}
+.bar{height:4px;background:var(--oak2);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--brass);width:0;transition:width .3s}
+.pts{color:var(--brass)}
+.rank{font:12px var(--f-mono);color:var(--muted);margin-top:-6px}
+.rank b{color:var(--text);font-weight:400}
+.sheet{position:relative;background:var(--sheet);color:var(--sheet-ink);border-radius:3px;padding:18px 18px 20px;min-height:220px;display:flex;flex-direction:column;gap:10px;box-shadow:0 18px 30px -18px #000,0 0 0 1px rgba(0,0,0,.4);overflow:hidden}
+.sheet-head{display:flex;justify-content:space-between;gap:8px;font:11px var(--f-mono);color:var(--sheet-muted);border-bottom:1px dashed var(--rule);padding-bottom:8px;text-transform:uppercase;letter-spacing:.04em}
+.q{font:700 20px/1.3 var(--f-body);margin:4px 0 0;text-wrap:balance;overflow-wrap:anywhere}
+.a{font:400 17px/1.45 var(--f-body);margin:0;overflow-wrap:anywhere}
+.ans{border-left:3px solid var(--brass-dim);padding-left:12px}
+.lab{font:500 11px var(--f-head);text-transform:uppercase;letter-spacing:.1em;color:var(--sheet-muted)}
+.blank{display:inline-block;min-width:4em;border-bottom:2px solid var(--stamp);color:transparent}
+.blank.open{color:var(--stamp);font-weight:700}
+.stamp{position:absolute;right:14px;bottom:18px;font:700 26px var(--f-head);letter-spacing:.08em;text-transform:uppercase;padding:4px 12px;border:3px solid currentColor;border-radius:4px;transform:rotate(-12deg) scale(1.8);opacity:0;pointer-events:none;mix-blend-mode:multiply}
+.stamp.ok{color:var(--ok)}.stamp.bad{color:var(--stamp)}
+.stamp.hit{animation:hit .35s cubic-bezier(.3,1.6,.5,1) forwards}
+@keyframes hit{to{transform:rotate(-12deg) scale(1);opacity:.85}}
+.opts{display:grid;gap:8px}
+.opts.two{grid-template-columns:1fr 1fr}
+.opt{text-align:left;border:1px solid #4a3a2e;background:var(--oak2);border-radius:6px;padding:12px 14px;font:15px/1.35 var(--f-body);color:var(--text);cursor:pointer;overflow-wrap:anywhere}
+.opts.two .opt{text-align:center}
+.opt.right{border-color:#3fbf84;background:#173527}
+.opt.wrong{border-color:var(--stamp);background:#3b1718}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:auto}
+.btn{border:0;border-radius:6px;padding:15px 12px;font:600 15px var(--f-head);text-transform:uppercase;letter-spacing:.06em;cursor:pointer;background:var(--brass);color:var(--oak)}
+.btn.ghost{background:none;color:var(--text);border:1px solid var(--brass-dim)}
+.btn.no{background:var(--stamp);color:#fff}.btn.yes{background:var(--ok);color:#fff}
+.btn.wide{grid-column:1/-1}
+button:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.verdict{text-align:center;align-items:center;justify-content:center}
+.verdict .big{font:700 34px/1.05 var(--f-head);text-transform:uppercase;letter-spacing:.04em;margin:6px 0}
+.verdict .stamp{position:static;transform:rotate(-8deg);opacity:.85;font-size:22px;margin:6px auto}
+.editor{display:flex;flex-direction:column;gap:10px}
+.editor input,.editor textarea{width:100%;box-sizing:border-box;background:var(--sheet);color:var(--sheet-ink);border:0;border-radius:3px;padding:12px;font:15px/1.5 var(--f-body)}
+.editor textarea{min-height:46vh;resize:vertical;font:13px/1.55 var(--f-mono)}
+.editor label{font:500 12px var(--f-head);text-transform:uppercase;letter-spacing:.1em;color:var(--brass)}
+.hint{font-size:13px;color:var(--muted);margin:0}
+.hint code{font-family:var(--f-mono);color:var(--text);background:var(--oak2);padding:1px 5px;border-radius:3px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--brass);color:var(--oak);padding:10px 16px;border-radius:4px;font:600 14px var(--f-head);text-transform:uppercase;letter-spacing:.05em;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.stamp.hit{opacity:.85;transform:rotate(-12deg)}}
+</style>
+
+</head>
+<body>
+<div class="app">
+  <header>
+    <div><div class="case" id="caseNo">ДЕЛО № 1-001/2026</div><h1 id="deckName">Уголовный процесс</h1></div>
+    <div class="tabs" role="group" aria-label="Раздел">
+      <button id="tabPlay" aria-pressed="true">Заседание</button>
+      <button id="tabEdit" aria-pressed="false">Материалы</button>
+    </div>
+  </header>
+
+  <section id="play" style="display:flex;flex-direction:column;gap:14px;flex:1">
+    <div class="modes" role="group" aria-label="Режим">
+      <button class="mode" data-mode="cards" aria-pressed="true">Допрос<span>вспомни ответ</span></button>
+      <button class="mode" data-mode="quiz" aria-pressed="false">Прения<span>выбери из 4</span></button>
+      <button class="mode" data-mode="gap" aria-pressed="false">Протокол<span>вставь слово</span></button>
+    </div>
+    <div class="hud">
+      <div class="trust" id="trust" aria-label="Доверие суда"></div>
+      <div class="bar"><i id="prog"></i></div>
+      <span class="pts" id="pts">0 баллов</span>
+    </div>
+    <div class="rank">Звание: <b id="rank">Стажёр</b> · <span id="count">вопрос 1 из 10</span></div>
+    <div id="stage" style="display:flex;flex-direction:column;gap:12px;flex:1"></div>
+  </section>
+
+  <section id="edit" class="editor" hidden>
+    <label for="nameIn">Предмет</label>
+    <input id="nameIn">
+    <label for="txt">Материалы дела, по одному тезису на строку</label>
+    <textarea id="txt" spellcheck="false"></textarea>
+    <p class="hint">Формат: <code>вопрос — ответ</code>. Также подходят <code>:</code> и <code>|</code>. Строка без разделителя пойдёт в режим «Протокол».</p>
+    <div class="actions">
+      <button class="btn ghost" id="resetBtn">Сбросить прогресс</button>
+      <button class="btn" id="saveBtn">Приобщить к делу</button>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const SAMPLE_NAME="Уголовный процесс";
+const SAMPLE=`Презумпция невиновности закреплена в статье — ст. 14 УПК РФ
+Принцип состязательности сторон закреплён в статье — ст. 15 УПК РФ
+Право подозреваемого и обвиняемого на защиту закреплено в статье — ст. 16 УПК РФ
+Срок задержания подозреваемого до решения суда — не более 48 часов
+Общий срок предварительного следствия — 2 месяца
+Общий срок дознания — 30 суток
+Кто избирает заключение под стражу как меру пресечения? — Только суд
+Перечень мер пресечения содержится в статье — ст. 98 УПК РФ
+Срок проверки сообщения о преступлении — 3 суток, с продлением до 10 или 30 суток
+Первая стадия уголовного процесса — Возбуждение уголовного дела
+Доказательства, полученные с нарушением УПК РФ, являются — Недопустимыми
+Свойства доказательств по ст. 88 УПК РФ — Относимость, допустимость, достоверность, достаточность
+Срок апелляционного обжалования приговора — 15 суток
+Мировой судья рассматривает дела о преступлениях с наказанием — не свыше 3 лет лишения свободы
+Дела частного обвинения возбуждаются — По заявлению потерпевшего
+Явка с повинной — Добровольное сообщение лица о совершённом им преступлении`;
+
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let deck=store.get("upk_deck")||{name:SAMPLE_NAME,text:SAMPLE,levels:{},cases:0};
+const ROUNDS=10, LIVES=3;
+let mode="cards",round=0,score=0,streak=0,lives=LIVES,current=null,answered=false,items=[];
+
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function parse(text){
+  return text.split("\n").map(s=>s.trim()).filter(Boolean).map(line=>{
+    const m=line.match(/^(.+?)\s+[—–-]\s+(.+)$/)||line.match(/^(.+?)\s*[:|]\s*(.+)$/);
+    return m?{q:m[1].trim(),a:m[2].trim(),key:line}:{q:null,a:line,key:line};
+  });
+}
+function load(){
+  items=parse(deck.text);
+  document.getElementById("deckName").textContent=deck.name||"Без названия";
+  document.getElementById("caseNo").textContent=`ДЕЛО № 1-${String((deck.cases||0)+1).padStart(3,"0")}/2026`;
+}
+const lvl=it=>deck.levels[it.key]||0;
+function pick(pool){
+  const w=pool.map(it=>4-lvl(it)),sum=w.reduce((a,b)=>a+b,0);let r=Math.random()*sum;
+  for(let i=0;i<pool.length;i++){r-=w[i];if(r<=0)return pool[i];}return pool[0];
+}
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;};
+const RANKS=[[0,"Стажёр"],[30,"Дознаватель"],[60,"Следователь"],[100,"Прокурор"],[150,"Судья"]];
+const rankOf=p=>RANKS.filter(r=>p>=r[0]).pop()[1];
+const stage=document.getElementById("stage");
+const gavel=`<svg viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="9" height="5" rx="1" transform="rotate(45 13.5 4.5)" fill="var(--brass)"/><path d="M11 11 4 18"/><path d="M14 21h8"/></svg>`;
+
+function hud(){
+  document.getElementById("trust").innerHTML=Array.from({length:LIVES},(_,i)=>`<span class="${i<lives?'':'lost'}">${gavel}</span>`).join("");
+  document.getElementById("prog").style.width=(round/ROUNDS*100)+"%";
+  document.getElementById("pts").textContent=`${score} ${score%10===1&&score%100!==11?'балл':(score%10>=2&&score%10<=4&&(score%100<10||score%100>=20))?'балла':'баллов'}`;
+  document.getElementById("rank").textContent=rankOf(score);
+  document.getElementById("count").textContent=`вопрос ${Math.min(round+1,ROUNDS)} из ${ROUNDS}`+(streak>=2?` · серия ×${streak}`:"");
+}
+function head(it,label){return `<div class="sheet-head"><span>${label}</span><span>Знание: ${"■".repeat(lvl(it))}${"□".repeat(3-lvl(it))}</span></div>`;}
+function stamp(ok){
+  const s=stage.querySelector(".stamp");if(!s)return;
+  s.textContent=ok?"Принято":"Отклонено";s.className="stamp "+(ok?"ok":"bad");void s.offsetWidth;s.classList.add("hit");
+}
+function mark(ok){
+  if(answered)return;answered=true;
+  const it=current;
+  deck.levels[it.key]=ok?Math.min(3,lvl(it)+1):0;
+  if(ok){streak++;score+=10+Math.min(streak-1,4)*2;}else{streak=0;lives--;}
+  store.set("upk_deck",deck);stamp(ok);hud();
+}
+function next(){round++;answered=false;if(lives<=0||round>=ROUNDS)return finish();render();}
+
+function render(){
+  hud();
+  if(items.length<2){stage.innerHTML=`<div class="sheet"><p class="q">В деле нет материалов</p><p class="a">Открой «Материалы» и добавь хотя бы два тезиса.</p></div>`;return;}
+  ({cards:renderCards,quiz:renderQuiz,gap:renderGap})[mode]();
+}
+function renderCards(){
+  const pool=items.filter(i=>i.q);if(!pool.length)return noPairs();
+  const it=current=pick(pool);
+  stage.innerHTML=`<div class="sheet">${head(it,"Протокол допроса")}<div class="lab">Вопрос суда</div><p class="q">${esc(it.q)}</p><div class="ans" id="ans" hidden><div class="lab">Ответ</div><p class="a">${esc(it.a)}</p></div><div class="stamp"></div></div>
+  <div class="actions" id="act"><button class="btn wide" id="show">Огласить ответ</button></div>`;
+  document.getElementById("show").onclick=()=>{
+    document.getElementById("ans").hidden=false;
+    document.getElementById("act").innerHTML=`<button class="btn no" id="no">Не вспомнил</button><button class="btn yes" id="yes">Знал</button>`;
+    document.getElementById("no").onclick=()=>{mark(false);setTimeout(next,700)};
+    document.getElementById("yes").onclick=()=>{mark(true);setTimeout(next,600)};
+  };
+}
+function choose(opts,correct,delayOk,delayBad){
+  stage.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    if(answered)return;const ok=opts[b.dataset.i]===correct;
+    stage.querySelectorAll(".opt").forEach(x=>{if(opts[x.dataset.i]===correct)x.classList.add("right")});
+    if(!ok)b.classList.add("wrong");
+    const bl=document.getElementById("bl");if(bl)bl.classList.add("open");
+    mark(ok);setTimeout(next,ok?delayOk:delayBad);
+  });
+}
+function renderQuiz(){
+  const pool=items.filter(i=>i.q);if(pool.length<2)return noPairs();
+  const it=current=pick(pool);
+  const opts=shuffle([it.a,...shuffle([...new Set(pool.map(x=>x.a).filter(a=>a!==it.a))]).slice(0,3)]);
+  stage.innerHTML=`<div class="sheet">${head(it,"Судебные прения")}<div class="lab">Позиция стороны</div><p class="q">${esc(it.q)}</p><div class="stamp"></div></div>
+  <div class="opts">${opts.map((o,i)=>`<button class="opt" data-i="${i}">${esc(o)}</button>`).join("")}</div>`;
+  choose(opts,it.a,750,1500);
+}
+const words=s=>s.match(/[A-Za-zА-Яа-яЁё]{5,}|\d+/g)||[];
+function renderGap(){
+  const pool=items.filter(i=>words(i.a).length);if(!pool.length)return noPairs();
+  const it=current=pick(pool);
+  const ws=words(it.a),nums=ws.filter(w=>/^\d+$/.test(w));
+  const target=nums.length&&Math.random()<.6?nums[Math.random()*nums.length|0]:[...ws].sort((a,b)=>b.length-a.length)[Math.random()*Math.min(2,ws.length)|0];
+  const isNum=/^\d+$/.test(target);
+  let others=[...new Set(items.flatMap(x=>words(x.a)).filter(w=>/^\d+$/.test(w)===isNum&&w.toLowerCase()!==target.toLowerCase()))];
+  if(isNum)while(others.length<3){const n=String(Math.max(1,+target+(Math.random()*20-10|0)));if(n!==target&&!others.includes(n))others.push(n);}
+  const opts=shuffle([target,...shuffle(others).sort((a,b)=>Math.abs(a.length-target.length)-Math.abs(b.length-target.length)).slice(0,3)]);
+  const re=new RegExp("(^|[^0-9A-Za-zА-Яа-яЁё])"+target.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"(?![0-9A-Za-zА-Яа-яЁё])");
+  const shown=esc(it.a).replace(re,(m,p)=>`${p}<span class="blank" id="bl">${esc(target)}</span>`);
+  stage.innerHTML=`<div class="sheet">${head(it,"Восстановить протокол")}<div class="lab">${it.q?esc(it.q):"Вставь пропущенное"}</div><p class="a" style="font-size:19px">${shown}</p><div class="stamp"></div></div>
+  <div class="opts two">${opts.map((o,i)=>`<button class="opt" data-i="${i}">${esc(o)}</button>`).join("")}</div>`;
+  choose(opts,target,800,1600);
+}
+function noPairs(){stage.innerHTML=`<div class="sheet"><p class="q">Для этого режима нужны строки «вопрос — ответ»</p><p class="a">Попробуй «Протокол» или добавь разделитель в материалы.</p></div>`;}
+function finish(){
+  document.getElementById("prog").style.width="100%";
+  deck.cases=(deck.cases||0)+1;store.set("upk_deck",deck);
+  const correct=Math.round(score>0?Math.min(ROUNDS,score/10):0);
+  const learned=items.filter(i=>lvl(i)>=3).length;
+  const lost=lives<=0;
+  const [title,st,ok]=lost?["Отвод заявлен","Дело проиграно",false]:score>=100?["Блестящая защита","Иск удовлетворён",true]:score>=60?["Позиция убедительна","Принято",true]:["Нужна доработка","На пересмотр",false];
+  stage.innerHTML=`<div class="sheet verdict"><div class="sheet-head" style="width:100%"><span>Приговор</span><span>${new Date().toLocaleDateString("ru-RU")}</span></div>
+  <div class="lab">Суд постановил</div><div class="big">${title}</div><div class="stamp ${ok?'ok':'bad'}">${st}</div>
+  <p class="a" style="color:var(--sheet-muted);font-size:15px">${lost?"Суд утратил доверие после трёх ошибок.<br>":""}Баллы: ${score} · звание: ${rankOf(score)}<br>Выучено намертво: ${learned} из ${items.length}</p></div>
+  <div class="actions"><button class="btn wide" id="again">Новое дело</button></div>`;
+  document.getElementById("again").onclick=()=>{load();restart();};
+}
+function restart(){round=0;score=0;streak=0;lives=LIVES;answered=false;render();}
+
+document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;document.querySelectorAll(".mode").forEach(x=>x.setAttribute("aria-pressed",x===b));restart();});
+const tabPlay=document.getElementById("tabPlay"),tabEdit=document.getElementById("tabEdit");
+function showTab(edit){
+  tabPlay.setAttribute("aria-pressed",!edit);tabEdit.setAttribute("aria-pressed",edit);
+  document.getElementById("play").style.display=edit?"none":"flex";document.getElementById("edit").hidden=!edit;
+  if(edit){document.getElementById("nameIn").value=deck.name;document.getElementById("txt").value=deck.text;}
+}
+tabPlay.onclick=()=>showTab(false);tabEdit.onclick=()=>showTab(true);
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800);}
+document.getElementById("saveBtn").onclick=()=>{
+  deck.name=document.getElementById("nameIn").value.trim()||"Уголовный процесс";deck.text=document.getElementById("txt").value;
+  store.set("upk_deck",deck);load();toast(`Приобщено: ${items.length} тезисов`);showTab(false);restart();
+};
+let armed=false;
+document.getElementById("resetBtn").onclick=e=>{
+  if(!armed){armed=true;e.target.textContent="Точно сбросить?";setTimeout(()=>{armed=false;e.target.textContent="Сбросить прогресс"},2500);return;}
+  deck.levels={};deck.cases=0;store.set("upk_deck",deck);load();armed=false;e.target.textContent="Сбросить прогресс";toast("Прогресс сброшен");
+};
+load();render();
+</script>
+
+<script>
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}
+</script>
+</body>
+</html>
